@@ -26,7 +26,11 @@ api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const original = err.config;
-    if (err.response?.status === 401 && !original._retry) {
+    const url = original?.url || '';
+
+    // Don't attempt refresh on auth endpoints (prevents infinite 401 loop)
+    const isAuthEndpoint = url.includes('/v1/auth/');
+    if (err.response?.status === 401 && !original._retry && !isAuthEndpoint) {
       original._retry = true;
       try {
         const { data } = await api.post('/v1/auth/refresh');
