@@ -1,0 +1,46 @@
+{
+  "dashboard": {
+    "title": "Cadencia — LLM Operations",
+    "uid": "cadencia-llm",
+    "tags": ["cadencia", "llm"],
+    "timezone": "Asia/Kolkata",
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1, "title": "LLM Calls/min", "type": "timeseries",
+        "gridPos": {"x": 0, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "rate(cadencia_llm_calls_total[1m]) * 60"}]
+      },
+      {
+        "id": 2, "title": "LLM Failure Rate (%)", "type": "gauge",
+        "gridPos": {"x": 8, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "rate(cadencia_llm_failures_total[5m]) / rate(cadencia_llm_calls_total[5m]) * 100"}],
+        "fieldConfig": {"defaults": {"thresholds": {"steps": [{"value": 0, "color": "green"}, {"value": 3, "color": "orange"}, {"value": 5, "color": "red"}]}}}
+      },
+      {
+        "id": 3, "title": "LLM p95 Latency (by operation)", "type": "timeseries",
+        "gridPos": {"x": 16, "y": 0, "w": 8, "h": 8},
+        "targets": [
+          {"expr": "histogram_quantile(0.95, rate(cadencia_llm_duration_seconds_bucket{op='extract_rfq'}[5m]))", "legendFormat": "extract_rfq"},
+          {"expr": "histogram_quantile(0.95, rate(cadencia_llm_duration_seconds_bucket{op='agent_turn'}[5m]))", "legendFormat": "agent_turn"},
+          {"expr": "histogram_quantile(0.95, rate(cadencia_llm_duration_seconds_bucket{op='embed'}[5m]))", "legendFormat": "embed"}
+        ]
+      },
+      {
+        "id": 4, "title": "LLM Retries/min", "type": "timeseries",
+        "gridPos": {"x": 0, "y": 8, "w": 8, "h": 6},
+        "targets": [{"expr": "rate(cadencia_llm_retries_total[1m]) * 60"}]
+      },
+      {
+        "id": 5, "title": "Circuit Breaker Open Events", "type": "timeseries",
+        "gridPos": {"x": 8, "y": 8, "w": 8, "h": 6},
+        "targets": [{"expr": "cadencia_circuit_breaker_open_total{name='llm'}"}]
+      },
+      {
+        "id": 6, "title": "Stub vs Live Driver", "type": "piechart",
+        "gridPos": {"x": 16, "y": 8, "w": 8, "h": 6},
+        "targets": [{"expr": "cadencia_llm_driver_calls_total", "legendFormat": "{{driver}}"}]
+      }
+    ]
+  }
+}

@@ -1,0 +1,149 @@
+# ═══════════════════════════════════════════════════════════════
+# Cadencia — Full Local Stack (dev + integration testing)
+# Phase Six: adds migration service, Caddy, prod-like networking
+#
+# Usage:
+#   cp .env.example .env  # fill in secrets
+#   docker compose up --wait
+#   curl http://localhost/health  (via Caddy)
+#   curl http://localhost:8000/health  (direct API)
+# ═══════════════════════════════════════════════════════════════
+
+version: "3.9"
+
+services:
+
+  # ── PostgreSQL 16 + pgvector ─────────────────────────────────
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: cadencia_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cadencia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cadencia_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-cadencia}
+    ports:
+      - "5432:5432"
+    volumes:
+      - cadencia_db_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cadencia} -d ${POSTGRES_DB:-cadencia}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Redis 7 ──────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: cadencia_redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:-cadencia_dev}
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - cadencia_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-cadencia_dev}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # ── Algorand localnet ────────────────────────────────────────
+  algorand:
+    image: algorand/algod:latest
+    container_name: cadencia_algorand
+    restart: unless-stopped
+    environment:
+      NETWORK: localnet
+      TOKEN: ${ALGORAND_ALGOD_TOKEN:-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
+    ports:
+      - "4001:4001"
+      - "4002:4002"
+    volumes:
+      - cadencia_algorand_data:/var/lib/algorand
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4001/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # ── Database migration (one-off) ─────────────────────────────
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migration
+    container_name: cadencia_migration
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-cadencia}:${POSTGRES_PASSWORD:-cadencia_dev}@db:5432/${POSTGRES_DB:-cadencia}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  # ── FastAPI API ──────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: cadencia_api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-cadencia}:${POSTGRES_PASSWORD:-cadencia_dev}@db:5432/${POSTGRES_DB:-cadencia}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-cadencia_dev}@redis:6379/0
+      ALGORAND_ALGOD_ADDRESS: http://algorand:4001
+      ALGORAND_ALGOD_TOKEN: ${ALGORAND_ALGOD_TOKEN:-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
+      LLM_PROVIDER: ${LLM_PROVIDER:-stub}
+    ports:
+      - "8000:8000"
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      algorand:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # ── Caddy reverse proxy ──────────────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    container_name: cadencia_caddy
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - cadencia_caddy_data:/data
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  cadencia_db_data:
+    driver: local
+  cadencia_redis_data:
+    driver: local
+  cadencia_algorand_data:
+    driver: local
+  cadencia_caddy_data:
+    driver: local

@@ -1,0 +1,42 @@
+{
+  "dashboard": {
+    "title": "Cadencia — Compliance & Audit",
+    "uid": "cadencia-compliance",
+    "tags": ["cadencia", "compliance", "audit"],
+    "timezone": "Asia/Kolkata",
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1, "title": "Audit Chain Integrity", "type": "gauge",
+        "gridPos": {"x": 0, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "cadencia_audit_chain_valid"}],
+        "fieldConfig": {"defaults": {"thresholds": {"steps": [{"value": 0, "color": "red"}, {"value": 1, "color": "green"}]}, "min": 0, "max": 1}}
+      },
+      {
+        "id": 2, "title": "Audit Entries Appended/hr", "type": "timeseries",
+        "gridPos": {"x": 8, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "increase(cadencia_audit_entries_total[1h])"}]
+      },
+      {
+        "id": 3, "title": "FEMA Records Generated/hr", "type": "timeseries",
+        "gridPos": {"x": 16, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "increase(cadencia_fema_records_total[1h])"}]
+      },
+      {
+        "id": 4, "title": "GST Records Generated/hr", "type": "timeseries",
+        "gridPos": {"x": 0, "y": 8, "w": 8, "h": 6},
+        "targets": [{"expr": "increase(cadencia_gst_records_total[1h])"}]
+      },
+      {
+        "id": 5, "title": "Bulk Export Jobs", "type": "table",
+        "gridPos": {"x": 8, "y": 8, "w": 8, "h": 6},
+        "targets": [{"expr": "cadencia_export_jobs_total", "legendFormat": "{{status}}"}]
+      },
+      {
+        "id": 6, "title": "Hash Chain Verification Latency", "type": "timeseries",
+        "gridPos": {"x": 16, "y": 8, "w": 8, "h": 6},
+        "targets": [{"expr": "histogram_quantile(0.95, rate(cadencia_chain_verify_duration_seconds_bucket[5m]))"}]
+      }
+    ]
+  }
+}

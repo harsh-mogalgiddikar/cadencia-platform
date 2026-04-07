@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --card: #191919;
+    --ring: #ffe0c2;
+    --input: #484848;
+    --muted: #222222;
+    --accent: #2a2a2a;
+    --border: #201e18;
+    --radius: 0.5rem;
+    --chart-1: #ffe0c2;
+    --chart-2: #393028;
+    --chart-3: #2a2a2a;
+    --chart-4: #42382e;
+    --chart-5: #ffe0c1;
+    --popover: #191919;
+    --primary: #ffe0c2;
+    --sidebar: #18181b;
+    --secondary: #393028;
+    --background: #111111;
+    --foreground: #eeeeee;
+    --destructive: #e54d2e;
+    --sidebar-ring: #d4d4d8;
+    --sidebar-accent: #27272a;
+    --sidebar-border: #27272a;
+    --card-foreground: #eeeeee;
+    --sidebar-primary: #1d4ed8;
+    --muted-foreground: #b4b4b4;
+    --accent-foreground: #eeeeee;
+    --popover-foreground: #eeeeee;
+    --primary-foreground: #081a1b;
+    --sidebar-foreground: #f4f4f5;
+    --secondary-foreground: #ffe0c2;
+    --destructive-foreground: #ffffff;
+    --sidebar-accent-foreground: #f4f4f5;
+    --sidebar-primary-foreground: #ffffff;
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}

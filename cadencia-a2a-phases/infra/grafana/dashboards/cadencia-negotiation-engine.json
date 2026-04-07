@@ -1,0 +1,45 @@
+{
+  "dashboard": {
+    "title": "Cadencia — Negotiation Engine",
+    "uid": "cadencia-negotiation",
+    "tags": ["cadencia", "negotiation"],
+    "timezone": "Asia/Kolkata",
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1, "title": "Active Sessions by Status", "type": "piechart",
+        "gridPos": {"x": 0, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "cadencia_negotiation_sessions_active", "legendFormat": "{{status}}"}]
+      },
+      {
+        "id": 2, "title": "Sessions Created vs Agreed (hourly)", "type": "timeseries",
+        "gridPos": {"x": 8, "y": 0, "w": 8, "h": 8},
+        "targets": [
+          {"expr": "increase(cadencia_sessions_created_total[1h])", "legendFormat": "created"},
+          {"expr": "increase(cadencia_sessions_agreed_total[1h])", "legendFormat": "agreed"}
+        ]
+      },
+      {
+        "id": 3, "title": "Agreement Rate (%)", "type": "gauge",
+        "gridPos": {"x": 16, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "cadencia_sessions_agreed_total / cadencia_sessions_created_total * 100"}],
+        "fieldConfig": {"defaults": {"thresholds": {"steps": [{"value": 0, "color": "red"}, {"value": 30, "color": "orange"}, {"value": 50, "color": "green"}]}}}
+      },
+      {
+        "id": 4, "title": "Avg Rounds to Agreement", "type": "stat",
+        "gridPos": {"x": 0, "y": 8, "w": 6, "h": 6},
+        "targets": [{"expr": "cadencia_avg_rounds_to_agreement"}]
+      },
+      {
+        "id": 5, "title": "Human Override Rate (%)", "type": "stat",
+        "gridPos": {"x": 6, "y": 8, "w": 6, "h": 6},
+        "targets": [{"expr": "cadencia_human_override_total / cadencia_agent_turns_total * 100"}]
+      },
+      {
+        "id": 6, "title": "Stall Escalation Rate", "type": "stat",
+        "gridPos": {"x": 12, "y": 8, "w": 6, "h": 6},
+        "targets": [{"expr": "rate(cadencia_stall_escalations_total[1h])"}]
+      }
+    ]
+  }
+}

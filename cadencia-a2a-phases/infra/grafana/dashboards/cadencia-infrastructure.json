@@ -1,0 +1,45 @@
+{
+  "dashboard": {
+    "title": "Cadencia — Infrastructure",
+    "uid": "cadencia-infra",
+    "tags": ["cadencia", "infrastructure"],
+    "timezone": "Asia/Kolkata",
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1, "title": "RDS CPU %", "type": "timeseries",
+        "gridPos": {"x": 0, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "aws_rds_cpu_utilization"}]
+      },
+      {
+        "id": 2, "title": "RDS Connections", "type": "timeseries",
+        "gridPos": {"x": 8, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "aws_rds_database_connections"}]
+      },
+      {
+        "id": 3, "title": "RDS Free Storage (GB)", "type": "stat",
+        "gridPos": {"x": 16, "y": 0, "w": 8, "h": 8},
+        "targets": [{"expr": "aws_rds_free_storage_space / 1073741824"}]
+      },
+      {
+        "id": 4, "title": "Redis Memory %", "type": "gauge",
+        "gridPos": {"x": 0, "y": 8, "w": 8, "h": 6},
+        "targets": [{"expr": "aws_elasticache_bytes_used_for_cache / aws_elasticache_cache_max_memory * 100"}],
+        "fieldConfig": {"defaults": {"thresholds": {"steps": [{"value": 0, "color": "green"}, {"value": 60, "color": "orange"}, {"value": 80, "color": "red"}]}}}
+      },
+      {
+        "id": 5, "title": "Redis Evictions", "type": "timeseries",
+        "gridPos": {"x": 8, "y": 8, "w": 8, "h": 6},
+        "targets": [{"expr": "aws_elasticache_evictions"}]
+      },
+      {
+        "id": 6, "title": "ECS Task CPU / Memory %", "type": "timeseries",
+        "gridPos": {"x": 16, "y": 8, "w": 8, "h": 6},
+        "targets": [
+          {"expr": "aws_ecs_cpu_utilization", "legendFormat": "CPU"},
+          {"expr": "aws_ecs_memory_utilization", "legendFormat": "Memory"}
+        ]
+      }
+    ]
+  }
+}

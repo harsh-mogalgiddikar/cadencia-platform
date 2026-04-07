@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cadencia — AI-Powered B2B Trade Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --card: #fcfcfc; --ring: #644a40; --input: #d8d8d8; --muted: #efefef;
+  --accent: #e8e8e8; --border: #d8d8d8; --radius: 0.5rem;
+  --chart-1: #644a40; --chart-2: #ffdfb5; --chart-3: #e8e8e8;
+  --chart-4: #ffe6c4; --chart-5: #66493e; --popover: #fcfcfc;
+  --primary: #644a40; --sidebar: #fbfbfb; --secondary: #ffdfb5;
+  --background: #f9f9f9; --foreground: #202020; --destructive: #e54d2e;
+  --sidebar-ring: #b5b5b5; --sidebar-accent: #f7f7f7; --sidebar-border: #ebebeb;
+  --card-foreground: #202020; --sidebar-primary: #343434; --muted-foreground: #646464;
+  --accent-foreground: #202020; --popover-foreground: #202020; --primary-foreground: #ffffff;
+  --sidebar-foreground: #252525; --secondary-foreground: #582d1d;
+  --destructive-foreground: #ffffff; --sidebar-accent-foreground: #343434;
+  --sidebar-primary-foreground: #fbfbfb;
+}
+[data-theme="dark"] {
+  --card: #191919; --ring: #ffe0c2; --input: #484848; --muted: #222222;
+  --accent: #2a2a2a; --border: #201e18; --radius: 0.5rem;
+  --chart-1: #ffe0c2; --chart-2: #393028; --chart-3: #2a2a2a;
+  --chart-4: #42382e; --chart-5: #ffe0c1; --popover: #191919;
+  --primary: #ffe0c2; --sidebar: #18181b; --secondary: #393028;
+  --background: #111111; --foreground: #eeeeee; --destructive: #e54d2e;
+  --sidebar-ring: #d4d4d8; --sidebar-accent: #27272a; --sidebar-border: #27272a;
+  --card-foreground: #eeeeee; --sidebar-primary: #1d4ed8; --muted-foreground: #b4b4b4;
+  --accent-foreground: #eeeeee; --popover-foreground: #eeeeee; --primary-foreground: #081a1b;
+  --sidebar-foreground: #f4f4f5; --secondary-foreground: #ffe0c2;
+  --destructive-foreground: #ffffff; --sidebar-accent-foreground: #f4f4f5;
+  --sidebar-primary-foreground: #ffffff;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--background);color:var(--foreground);
+  font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6;
+  transition:background .3s,color .3s;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:1000;opacity:.4;
+}
+
+h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:500;line-height:1.1;letter-spacing:-.01em}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* icons */
+svg.ico{display:inline-block;vertical-align:middle;flex-shrink:0;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:0 2.5rem;height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:color-mix(in srgb,var(--background) 88%,transparent);
+  backdrop-filter:blur(20px) saturate(1.4);
+  border-bottom:1px solid transparent;
+  transition:border-color .3s;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-mark{
+  width:32px;height:32px;background:var(--primary);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;color:var(--primary-foreground);
+}
+.nav-logo-text{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:var(--foreground);letter-spacing:.02em}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{text-decoration:none;color:var(--muted-foreground);font-size:.875rem;letter-spacing:.02em;transition:color .2s}
+.nav-links a:hover{color:var(--foreground)}
+.nav-actions{display:flex;align-items:center;gap:1rem}
+.btn-ghost{background:none;border:none;padding:.5rem 1rem;color:var(--muted-foreground);font-family:'DM Sans',sans-serif;font-size:.875rem;cursor:pointer;border-radius:var(--radius);transition:all .2s}
+.btn-ghost:hover{color:var(--foreground);background:var(--accent)}
+.btn-primary{background:var(--primary);color:var(--primary-foreground);border:none;padding:.55rem 1.35rem;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:500;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 4px 16px color-mix(in srgb,var(--primary) 30%,transparent)}
+.theme-toggle{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground);transition:all .2s}
+.theme-toggle:hover{background:var(--accent);color:var(--foreground)}
+
+/* ── HERO ── */
+.hero{min-height:100vh;padding:120px 2.5rem 80px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;text-align:center;overflow:hidden}
+.hero-bg-ring{position:absolute;border-radius:50%;border:1px solid color-mix(in srgb,var(--primary) 15%,transparent);pointer-events:none;animation:spin 40s linear infinite}
+.hero-bg-ring:nth-child(1){width:600px;height:600px;top:50%;left:50%;transform:translate(-50%,-50%)}
+.hero-bg-ring:nth-child(2){width:900px;height:900px;top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:55s;animation-direction:reverse;opacity:.6}
+.hero-bg-ring:nth-child(3){width:1200px;height:1200px;top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:75s;opacity:.35}
+@keyframes spin{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.hero-bg-glow{position:absolute;width:800px;height:500px;background:radial-gradient(ellipse,color-mix(in srgb,var(--secondary) 35%,transparent) 0%,transparent 70%);top:20%;left:50%;transform:translateX(-50%);pointer-events:none;filter:blur(40px)}
+
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:color-mix(in srgb,var(--secondary) 50%,transparent);border:1px solid color-mix(in srgb,var(--secondary-foreground) 20%,transparent);border-radius:100px;padding:.35rem 1rem;font-size:.78rem;font-weight:500;color:var(--secondary-foreground);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2rem;animation:up .6s both}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--secondary-foreground);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.hero-title{font-size:clamp(3.8rem,8vw,7.5rem);font-weight:400;line-height:1.02;letter-spacing:-.02em;color:var(--foreground);max-width:900px;animation:up .7s .1s both}
+.hero-title em{font-style:italic;color:var(--primary)}
+.hero-subtitle{max-width:540px;color:var(--muted-foreground);font-size:1.05rem;font-weight:300;line-height:1.75;margin:1.75rem auto 0;animation:up .7s .2s both}
+.hero-cta{display:flex;gap:1rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap;animation:up .7s .3s both}
+.btn-cta-p{background:var(--primary);color:var(--primary-foreground);border:none;padding:.85rem 2rem;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:all .25s}
+.btn-cta-p:hover{opacity:.88;transform:translateY(-2px);box-shadow:0 8px 30px color-mix(in srgb,var(--primary) 35%,transparent)}
+.btn-cta-s{background:transparent;color:var(--foreground);border:1px solid var(--border);padding:.85rem 2rem;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:400;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:all .25s}
+.btn-cta-s:hover{background:var(--accent);border-color:var(--muted-foreground);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:3rem;justify-content:center;margin-top:4rem;animation:up .7s .4s both}
+.hero-stat{text-align:center}
+.hero-stat-value{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:500;color:var(--foreground);display:block;line-height:1}
+.hero-stat-label{font-size:.75rem;color:var(--muted-foreground);letter-spacing:.06em;text-transform:uppercase;margin-top:.3rem;display:block}
+.hero-divider{width:1px;height:40px;background:var(--border);align-self:center}
+
+/* ── PREVIEW ── */
+.preview-section{padding:0 2.5rem 100px;display:flex;justify-content:center}
+.preview-wrapper{max-width:1100px;width:100%;position:relative;animation:up .8s .5s both}
+.preview-glow{position:absolute;inset:-30px;background:radial-gradient(ellipse at center,color-mix(in srgb,var(--secondary) 25%,transparent) 0%,transparent 60%);filter:blur(30px);pointer-events:none}
+.preview-frame{position:relative;z-index:1;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px color-mix(in srgb,var(--foreground) 4%,transparent),0 24px 64px color-mix(in srgb,var(--foreground) 8%,transparent)}
+.preview-bar{background:var(--sidebar);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.preview-dots{display:flex;gap:6px}
+.preview-dot{width:10px;height:10px;border-radius:50%}
+.preview-dot:nth-child(1){background:#e54d2e}
+.preview-dot:nth-child(2){background:#f5a623}
+.preview-dot:nth-child(3){background:#22c55e}
+.preview-url{flex:1;background:var(--accent);border-radius:6px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted-foreground);max-width:300px;display:flex;align-items:center;gap:6px}
+.preview-body{display:grid;grid-template-columns:200px 1fr;min-height:420px}
+.preview-sidebar{background:var(--sidebar);border-right:1px solid var(--border);padding:20px 0}
+.preview-sidebar-logo{padding:0 16px 20px;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--foreground);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.pslm{width:22px;height:22px;background:var(--primary);border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--primary-foreground)}
+.pni{padding:8px 16px;display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted-foreground);cursor:pointer;margin:1px 8px;border-radius:6px;transition:all .15s}
+.pni.active{background:color-mix(in srgb,var(--primary) 12%,transparent);color:var(--primary);font-weight:500}
+.preview-main{padding:20px;overflow:hidden}
+.preview-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.preview-heading{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;color:var(--foreground)}
+.preview-badge{background:color-mix(in srgb,#22c55e 15%,transparent);color:#22c55e;border:1px solid color-mix(in srgb,#22c55e 30%,transparent);font-size:.68rem;font-weight:500;padding:3px 10px;border-radius:100px;letter-spacing:.04em;display:flex;align-items:center;gap:5px}
+.pbdot{width:5px;height:5px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+.preview-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.pc{background:var(--background);border:1px solid var(--border);border-radius:8px;padding:12px}
+.pc-label{font-size:.68rem;color:var(--muted-foreground);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.pc-value{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:500;color:var(--foreground);line-height:1}
+.pc-sub{font-size:.65rem;color:#22c55e;margin-top:3px}
+.preview-chart-area{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pcbox{background:var(--background);border:1px solid var(--border);border-radius:8px;padding:12px}
+.pct{font-size:.72rem;font-weight:500;color:var(--foreground);margin-bottom:10px}
+.pcs{width:100%;height:80px}
+.ptl{display:flex;flex-direction:column;gap:6px}
+.pti{display:flex;align-items:center;gap:8px;font-size:.68rem}
+.ptd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ptt{color:var(--muted-foreground);flex:1}
+.ptp{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--foreground)}
+
+/* ── SECTION ── */
+.section{padding:100px 2.5rem;position:relative}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-eyebrow{font-size:.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--primary);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.section-eyebrow::before{content:'';width:24px;height:1px;background:var(--primary)}
+.section-title{font-size:clamp(2.4rem,4vw,3.5rem);color:var(--foreground);max-width:600px;margin-bottom:1.5rem}
+.section-body{color:var(--muted-foreground);font-size:1rem;font-weight:300;max-width:480px;line-height:1.8}
+
+/* ── HOW ── */
+.how-section{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:4rem;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.step{background:var(--card);padding:2.5rem 2rem;transition:background .2s}
+.step:not(:last-child){border-right:1px solid var(--border)}
+.step:hover{background:color-mix(in srgb,var(--secondary) 12%,var(--card))}
+.step-number{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted-foreground);letter-spacing:.08em;margin-bottom:1.5rem}
+.step-icon{width:44px;height:44px;background:color-mix(in srgb,var(--primary) 12%,transparent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;border:1px solid color-mix(in srgb,var(--primary) 20%,transparent);color:var(--primary)}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:500;color:var(--foreground);margin-bottom:.6rem}
+.step-desc{font-size:.85rem;color:var(--muted-foreground);line-height:1.7;font-weight:300}
+
+/* ── FEATURES ── */
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:4rem}
+.fc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;transition:all .25s;position:relative;overflow:hidden}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--primary),transparent);opacity:0;transition:opacity .3s}
+.fc:hover::before{opacity:1}
+.fc:hover{border-color:color-mix(in srgb,var(--primary) 35%,transparent);transform:translateY(-3px);box-shadow:0 8px 30px color-mix(in srgb,var(--foreground) 6%,transparent)}
+.fc-icon{width:48px;height:48px;background:color-mix(in srgb,var(--secondary) 40%,transparent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;border:1px solid color-mix(in srgb,var(--secondary-foreground) 15%,transparent);color:var(--secondary-foreground)}
+.fc-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:500;color:var(--foreground);margin-bottom:.6rem}
+.fc-desc{font-size:.875rem;color:var(--muted-foreground);line-height:1.75;font-weight:300}
+.fc-tag{display:inline-block;margin-top:1rem;padding:.25rem .75rem;background:color-mix(in srgb,var(--secondary) 40%,transparent);border-radius:100px;font-size:.72rem;font-weight:500;color:var(--secondary-foreground);letter-spacing:.04em}
+
+/* ── TRUST ── */
+.trust-section{background:var(--muted);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.companies-row{display:flex;gap:3rem;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:3rem;opacity:.5}
+.company-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;letter-spacing:.05em;color:var(--foreground)}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+.tcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem}
+.tquote{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--foreground);line-height:1.6;margin-bottom:1.5rem}
+.tauthor{display:flex;align-items:center;gap:.75rem}
+.tavatar{width:36px;height:36px;border-radius:50%;background:color-mix(in srgb,var(--primary) 20%,transparent);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:.9rem;color:var(--primary);font-weight:600;border:1px solid color-mix(in srgb,var(--primary) 30%,transparent);flex-shrink:0}
+.tname{font-size:.85rem;font-weight:500;color:var(--foreground)}
+.trole{font-size:.75rem;color:var(--muted-foreground)}
+
+/* ── BLOCKCHAIN ── */
+.blockchain-section{background:color-mix(in srgb,var(--secondary) 15%,var(--background))}
+.blockchain-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-top:4rem}
+.blockchain-visual{position:relative;height:360px;display:flex;align-items:center;justify-content:center}
+.bc-center{width:80px;height:80px;background:var(--primary);border-radius:20px;display:flex;align-items:center;justify-content:center;z-index:2;position:relative;box-shadow:0 0 40px color-mix(in srgb,var(--primary) 30%,transparent);color:var(--primary-foreground)}
+.bc-orbit{position:absolute;border:1px dashed color-mix(in srgb,var(--primary) 25%,transparent);border-radius:50%;animation:spin 25s linear infinite}
+.bc-orbit:nth-child(2){width:200px;height:200px}
+.bc-orbit:nth-child(3){width:320px;height:320px;animation-duration:35s;animation-direction:reverse}
+.bc-node{position:absolute;width:40px;height:40px;background:var(--card);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px color-mix(in srgb,var(--foreground) 6%,transparent);color:var(--primary)}
+.bc-list{list-style:none;display:flex;flex-direction:column;gap:1rem}
+.bc-item{display:flex;gap:1rem;align-items:flex-start}
+.bc-icon{width:36px;height:36px;background:color-mix(in srgb,var(--primary) 12%,transparent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;border:1px solid color-mix(in srgb,var(--primary) 20%,transparent);color:var(--primary)}
+.bc-title{font-weight:500;color:var(--foreground);font-size:.9rem;margin-bottom:.2rem}
+.bc-desc{font-size:.82rem;color:var(--muted-foreground);line-height:1.6;font-weight:300}
+
+/* ── CTA ── */
+.cta-section{padding:100px 2.5rem;text-align:center;background:var(--foreground);position:relative;overflow:hidden}
+.cta-glow{position:absolute;width:600px;height:400px;background:radial-gradient(ellipse,color-mix(in srgb,var(--secondary) 20%,transparent),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);filter:blur(60px);pointer-events:none}
+.cta-section .section-eyebrow{color:var(--secondary);justify-content:center}
+.cta-section .section-eyebrow::before{background:var(--secondary)}
+.cta-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.8rem,5vw,4.5rem);font-weight:400;color:var(--background);max-width:640px;margin:0 auto 1.5rem;line-height:1.1}
+.cta-title em{font-style:italic}
+[data-theme="dark"] .cta-section{background:var(--card)}
+[data-theme="dark"] .cta-title{color:var(--foreground)}
+.cta-sub{color:color-mix(in srgb,var(--background) 65%,transparent);font-size:1rem;font-weight:300;max-width:440px;margin:0 auto 2.5rem}
+[data-theme="dark"] .cta-sub{color:var(--muted-foreground)}
+.cta-form{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;max-width:480px;margin:0 auto}
+.cta-input{flex:1;min-width:240px;background:color-mix(in srgb,var(--background) 12%,transparent);border:1px solid color-mix(in srgb,var(--background) 25%,transparent);color:var(--background);padding:.85rem 1.25rem;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s}
+.cta-input::placeholder{color:color-mix(in srgb,var(--background) 45%,transparent)}
+.cta-input:focus{border-color:color-mix(in srgb,var(--background) 55%,transparent)}
+[data-theme="dark"] .cta-input{background:var(--accent);border-color:var(--border);color:var(--foreground)}
+[data-theme="dark"] .cta-input::placeholder{color:var(--muted-foreground)}
+.btn-cta-w{background:var(--background);color:var(--foreground);border:none;padding:.85rem 1.75rem;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;border-radius:var(--radius);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .2s}
+.btn-cta-w:hover{opacity:.9;transform:translateY(-1px)}
+[data-theme="dark"] .btn-cta-w{background:var(--primary);color:var(--primary-foreground)}
+
+/* ── FOOTER ── */
+footer{background:var(--card);border-top:1px solid var(--border);padding:3rem 2.5rem}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem}
+.footer-brand{display:flex;flex-direction:column;gap:1rem}
+.footer-logo{display:flex;align-items:center;gap:8px;font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--foreground)}
+.flm{width:26px;height:26px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--primary-foreground)}
+.footer-tagline{font-size:.82rem;color:var(--muted-foreground);line-height:1.6;font-weight:300;max-width:220px}
+.footer-gstin{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted-foreground);letter-spacing:.04em}
+.fcol-title{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--foreground);margin-bottom:1rem}
+.flinks{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.flinks a{text-decoration:none;font-size:.85rem;color:var(--muted-foreground);transition:color .2s;font-weight:300}
+.flinks a:hover{color:var(--foreground)}
+.footer-bottom{max-width:1100px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.fcopy{font-size:.78rem;color:var(--muted-foreground);font-weight:300}
+.fmade{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted-foreground);font-family:'JetBrains Mono',monospace}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .65s,transform .65s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+
+@media(max-width:900px){
+  .nav-links{display:none}
+  .preview-body{grid-template-columns:1fr}
+  .preview-sidebar{display:none}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .step:nth-child(2){border-right:none}
+  .step:nth-child(1),.step:nth-child(2){border-bottom:1px solid var(--border)}
+  .features-grid,.testimonials-grid{grid-template-columns:1fr}
+  .blockchain-grid{grid-template-columns:1fr}
+  .blockchain-visual{display:none}
+  .footer-inner{grid-template-columns:1fr 1fr}
+  .preview-cards{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg class="ico" width="16" height="16" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+    </div>
+    <span class="nav-logo-text">Cadencia</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#blockchain">Settlement</a></li>
+    <li><a href="#trust">Customers</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle">
+      <svg id="iconMoon" class="ico" width="16" height="16" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="iconSun"  class="ico" width="16" height="16" stroke-width="2" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="btn-ghost">Sign in</button>
+    <button class="btn-primary">
+      Get access
+      <svg class="ico" width="14" height="14" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-ring"></div>
+  <div class="hero-bg-ring"></div>
+  <div class="hero-bg-ring"></div>
+  <div class="hero-bg-glow"></div>
+
+  <div class="hero-eyebrow">
+    <span class="eyebrow-dot"></span>
+    Now in private beta &nbsp;·&nbsp; India's first AI-native B2B trade platform
+  </div>
+
+  <h1 class="hero-title">Trade at the speed<br>of <em>intelligence</em></h1>
+
+  <p class="hero-subtitle">Cadencia automates the entire B2B procurement cycle — from RFQ to negotiation to on-chain settlement — so your team focuses on strategy, not spreadsheets.</p>
+
+  <div class="hero-cta">
+    <button class="btn-cta-p">
+      Start trading free
+      <svg class="ico" width="15" height="15" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+    <button class="btn-cta-s">
+      <svg class="ico" width="15" height="15" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+      Watch 2-min demo
+    </button>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-value">₹2,400Cr</span>
+      <span class="hero-stat-label">Trade volume facilitated</span>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-value">94%</span>
+      <span class="hero-stat-label">Negotiation success rate</span>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-value">3.2×</span>
+      <span class="hero-stat-label">Faster deal closure</span>
+    </div>
+  </div>
+</section>
+
+<!-- PREVIEW -->
+<div class="preview-section">
+  <div class="preview-wrapper">
+    <div class="preview-glow"></div>
+    <div class="preview-frame">
+      <div class="preview-bar">
+        <div class="preview-dots"><div class="preview-dot"></div><div class="preview-dot"></div><div class="preview-dot"></div></div>
+        <div class="preview-url">
+          <svg class="ico" width="10" height="10" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          app.cadencia.in/dashboard
+        </div>
+      </div>
+      <div class="preview-body">
+        <div class="preview-sidebar">
+          <div class="preview-sidebar-logo">
+            <div class="pslm">
+              <svg class="ico" width="12" height="12" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            Cadencia
+          </div>
+          <div class="pni active">
+            <svg class="ico" width="13" height="13" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </div>
+          <div class="pni">
+            <svg class="ico" width="13" height="13" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Marketplace
+          </div>
+          <div class="pni">
+            <svg class="ico" width="13" height="13" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Negotiations
+          </div>
+          <div class="pni">
+            <svg class="ico" width="13" height="13" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Escrow
+          </div>
+          <div class="pni">
+            <svg class="ico" width="13" height="13" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Treasury
+          </div>
+          <div class="pni">
+            <svg class="ico" width="13" height="13" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Compliance
+          </div>
+        </div>
+        <div class="preview-main">
+          <div class="preview-header">
+            <div class="preview-heading">Good morning, Arjun</div>
+            <div class="preview-badge"><div class="pbdot"></div>All systems operational</div>
+          </div>
+          <div class="preview-cards">
+            <div class="pc"><div class="pc-label">Active RFQs</div><div class="pc-value">12</div><div class="pc-sub">+3 new today</div></div>
+            <div class="pc"><div class="pc-label">Live Sessions</div><div class="pc-value">7</div><div class="pc-sub">94% success</div></div>
+            <div class="pc"><div class="pc-label">Pending Escrow</div><div class="pc-value">₹2.5Cr</div><div class="pc-sub">3 contracts</div></div>
+            <div class="pc"><div class="pc-label">Runway</div><div class="pc-value">48d</div><div class="pc-sub" style="color:#f59e0b">Amber alert</div></div>
+          </div>
+          <div class="preview-chart-area">
+            <div class="pcbox">
+              <div class="pct">Price Convergence — #S001</div>
+              <svg class="pcs" viewBox="0 0 240 80" preserveAspectRatio="none">
+                <path d="M0,65 L48,58 L96,50 L144,42 L192,36 L240,30" stroke="var(--primary)" stroke-width="2" fill="none"/>
+                <path d="M0,15 L48,22 L96,32 L144,38 L192,34 L240,30" stroke="#22c55e" stroke-width="2" fill="none"/>
+                <circle cx="240" cy="30" r="4" fill="var(--primary)" opacity=".8"/>
+                <text x="155" y="10" font-size="7" fill="var(--muted-foreground)" font-family="JetBrains Mono,monospace">Converging</text>
+              </svg>
+            </div>
+            <div class="pcbox">
+              <div class="pct">Live Negotiation · Round 5</div>
+              <div class="ptl">
+                <div class="pti"><div class="ptd" style="background:var(--primary)"></div><span class="ptt">Buyer Agent</span><span class="ptp">₹38,000/MT</span></div>
+                <div class="pti"><div class="ptd" style="background:#22c55e"></div><span class="ptt">Seller counter</span><span class="ptp">₹44,500/MT</span></div>
+                <div class="pti"><div class="ptd" style="background:var(--primary)"></div><span class="ptt">Buyer revised</span><span class="ptp">₹40,200/MT</span></div>
+                <div class="pti" style="opacity:.45"><div class="ptd" style="background:var(--muted-foreground)"></div><span class="ptt">Seller responding…</span><span class="ptp">···</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section how-section" id="how">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">How it works</div>
+      <h2 class="section-title">Four steps from<br>requirement to settlement</h2>
+      <p class="section-body">The entire trade lifecycle — automated, compliant, and on-chain. No back-and-forth emails, no manual reconciliation.</p>
+    </div>
+    <div class="steps-grid reveal reveal-delay-2">
+      <div class="step">
+        <div class="step-number">01 / RFQ</div>
+        <div class="step-icon">
+          <svg class="ico" width="20" height="20" stroke-width="1.75" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <div class="step-title">Post your requirement</div>
+        <p class="step-desc">Describe your requirement in plain language. Our AI parses product specs, quantities, budgets, and delivery terms automatically.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">02 / MATCH</div>
+        <div class="step-icon">
+          <svg class="ico" width="20" height="20" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="step-title">AI finds the best sellers</div>
+        <p class="step-desc">Vector embeddings rank sellers by capability match. You see a scored shortlist — confirm one to begin negotiation.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">03 / NEGOTIATE</div>
+        <div class="step-icon">
+          <svg class="ico" width="20" height="20" stroke-width="1.75" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="step-title">Agents negotiate for you</div>
+        <p class="step-desc">AI agents exchange offers in real time. You watch the price converge — or step in with a human override anytime.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">04 / SETTLE</div>
+        <div class="step-icon">
+          <svg class="ico" width="20" height="20" stroke-width="1.75" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="step-title">On-chain escrow &amp; compliance</div>
+        <p class="step-desc">Algorand smart contracts hold funds in escrow. FEMA and GST reports are auto-generated. Settlement is instant.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Platform features</div>
+      <h2 class="section-title">Everything a modern trading desk needs</h2>
+    </div>
+    <div class="features-grid">
+      <div class="fc reveal reveal-delay-1">
+        <div class="fc-icon">
+          <svg class="ico" width="22" height="22" stroke-width="1.75" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M21.17 8H12V2a10 10 0 0 1 9.17 6z"/></svg>
+        </div>
+        <div class="fc-title">Autonomous AI Negotiations</div>
+        <p class="fc-desc">Configure your agent's style — aggressive, balanced, or conservative. Set floor prices and max rounds. The agent works 24/7 so you don't have to.</p>
+        <span class="fc-tag">Groq Llama 3.3 70B</span>
+      </div>
+      <div class="fc reveal reveal-delay-2">
+        <div class="fc-icon">
+          <svg class="ico" width="22" height="22" stroke-width="1.75" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="fc-title">Live SSE Negotiation Room</div>
+        <p class="fc-desc">Watch every offer and counter-offer in real time. Price convergence charts update live. Jump in with a human override if the deal needs a personal touch.</p>
+        <span class="fc-tag">Server-Sent Events</span>
+      </div>
+      <div class="fc reveal reveal-delay-3">
+        <div class="fc-icon">
+          <svg class="ico" width="22" height="22" stroke-width="1.75" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="fc-title">Treasury &amp; FX Dashboard</div>
+        <p class="fc-desc">Multi-currency pool balances across INR, USDC, and ALGO. Live FX exposure, unrealized P&amp;L, and a 30-day liquidity runway forecast.</p>
+        <span class="fc-tag">Multi-currency</span>
+      </div>
+      <div class="fc reveal reveal-delay-4">
+        <div class="fc-icon">
+          <svg class="ico" width="22" height="22" stroke-width="1.75" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div class="fc-title">Compliance Auto-filing</div>
+        <p class="fc-desc">Every trade generates FEMA and GST reports automatically. Export as PDF or CSV. Audit trails are immutable, timestamped, and verifiable on-chain.</p>
+        <span class="fc-tag">FEMA · GST · RBI</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCKCHAIN -->
+<section class="section blockchain-section" id="blockchain">
+  <div class="section-inner">
+    <div class="blockchain-grid">
+      <div class="reveal">
+        <div class="section-eyebrow">On-chain settlement</div>
+        <h2 class="section-title">Escrow that runs itself</h2>
+        <p class="section-body" style="margin-bottom:2.5rem">Algorand smart contracts hold buyer funds until delivery is confirmed. No intermediaries. No delays. Fully auditable on a public ledger.</p>
+        <ul class="bc-list">
+          <li class="bc-item">
+            <div class="bc-icon"><svg class="ico" width="16" height="16" stroke-width="1.75" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div><div class="bc-title">Atomic group transactions</div><div class="bc-desc">Fund via Pera Wallet with a single tap. The escrow app call and payment are grouped atomically — either both succeed or neither does.</div></div>
+          </li>
+          <li class="bc-item">
+            <div class="bc-icon"><svg class="ico" width="16" height="16" stroke-width="1.75" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <div><div class="bc-title">Release, refund, or freeze</div><div class="bc-desc">Admins can release funds to the seller, refund to buyer, or freeze the escrow pending dispute resolution.</div></div>
+          </li>
+          <li class="bc-item">
+            <div class="bc-icon"><svg class="ico" width="16" height="16" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+            <div><div class="bc-title">Cross-border FEMA compliance</div><div class="bc-desc">Automatic FEMA filings for cross-border trades. Every transaction is linked to a GST-compliant invoice trail.</div></div>
+          </li>
+        </ul>
+      </div>
+      <div class="blockchain-visual reveal reveal-delay-2">
+        <div class="bc-orbit" style="width:200px;height:200px">
+          <div class="bc-node" style="top:-20px;left:50%;transform:translateX(-50%)"><svg class="ico" width="16" height="16" stroke-width="1.75" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+          <div class="bc-node" style="bottom:-20px;left:50%;transform:translateX(-50%)"><svg class="ico" width="16" height="16" stroke-width="1.75" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        </div>
+        <div class="bc-orbit" style="width:320px;height:320px">
+          <div class="bc-node" style="top:-20px;left:50%;transform:translateX(-50%)"><svg class="ico" width="16" height="16" stroke-width="1.75" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="bc-node" style="bottom:-20px;left:50%;transform:translateX(-50%)"><svg class="ico" width="16" height="16" stroke-width="1.75" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="bc-node" style="left:-20px;top:50%;transform:translateY(-50%)"><svg class="ico" width="16" height="16" stroke-width="1.75" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <div class="bc-node" style="right:-20px;top:50%;transform:translateY(-50%)"><svg class="ico" width="16" height="16" stroke-width="1.75" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        </div>
+        <div class="bc-center">
+          <svg class="ico" width="32" height="32" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="section trust-section" id="trust">
+  <div class="section-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-eyebrow" style="justify-content:center">Trusted by India's industrial enterprises</div>
+      <h2 class="section-title" style="max-width:100%;text-align:center;margin:0 auto .5rem">Powering trade across sectors</h2>
+    </div>
+    <div class="companies-row reveal reveal-delay-1">
+      <span class="company-name">Tata Steel</span>
+      <span class="company-name">JSW Group</span>
+      <span class="company-name">Hindalco</span>
+      <span class="company-name">SAIL</span>
+      <span class="company-name">Ambuja Cements</span>
+      <span class="company-name">Reliance Retail</span>
+    </div>
+    <div class="testimonials-grid">
+      <div class="tcard reveal reveal-delay-1">
+        <div class="tquote">"Cadencia closed a ₹8Cr steel procurement in 4 hours. Our agents negotiated while our team slept."</div>
+        <div class="tauthor"><div class="tavatar">RV</div><div><div class="tname">Rahul Verma</div><div class="trole">VP Procurement, Tata Steel Ltd</div></div></div>
+      </div>
+      <div class="tcard reveal reveal-delay-2">
+        <div class="tquote">"The FEMA compliance automation alone saved us 3 days of paperwork per cross-border deal. Remarkable."</div>
+        <div class="tauthor"><div class="tavatar">SP</div><div><div class="tname">Sunita Patel</div><div class="trole">CFO, Hindalco Industries</div></div></div>
+      </div>
+      <div class="tcard reveal reveal-delay-3">
+        <div class="tquote">"The escrow on Algorand gives our finance team full visibility. No more trust issues with new counterparties."</div>
+        <div class="tauthor"><div class="tavatar">AK</div><div><div class="tname">Amit Kumar</div><div class="trole">Head of Trade Finance, JSW Group</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="section-eyebrow">Ready to automate your trade desk?</div>
+  <h2 class="cta-title">Start closing deals<br><em>intelligently</em></h2>
+  <p class="cta-sub">Join 200+ enterprises already using Cadencia. Free to start, no credit card required.</p>
+  <div class="cta-form">
+    <input type="email" class="cta-input" placeholder="Enter your work email" />
+    <button class="btn-cta-w">
+      Get early access
+      <svg class="ico" width="14" height="14" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+  <p style="margin-top:1rem;font-size:.75rem;color:color-mix(in srgb,var(--background) 40%,transparent)">By signing up, you agree to our Terms of Service and Privacy Policy.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <div class="flm">
+          <svg class="ico" width="13" height="13" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        Cadencia
+      </div>
+      <p class="footer-tagline">AI-powered B2B trade platform for Indian enterprises. From RFQ to settlement, automated.</p>
+      <span class="footer-gstin">CIN: U74999MH2024PTC123456</span>
+    </div>
+    <div>
+      <div class="fcol-title">Platform</div>
+      <ul class="flinks">
+        <li><a href="#">Marketplace</a></li><li><a href="#">AI Negotiations</a></li>
+        <li><a href="#">Escrow</a></li><li><a href="#">Treasury</a></li><li><a href="#">Compliance</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="fcol-title">Company</div>
+      <ul class="flinks">
+        <li><a href="#">About</a></li><li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li><li><a href="#">Press kit</a></li><li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="fcol-title">Legal</div>
+      <ul class="flinks">
+        <li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Security</a></li><li><a href="#">FEMA Compliance</a></li><li><a href="#">Cookie Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="fcopy">© 2025 Cadencia Technologies Pvt. Ltd. · Mumbai, Maharashtra · All rights reserved.</span>
+    <span class="fmade">
+      <svg class="ico" width="12" height="12" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Built on Algorand · Powered by Groq · Made in India
+    </span>
+  </div>
+</footer>
+
+<script>
+// Theme toggle
+const toggle = document.getElementById('themeToggle');
+const moon = document.getElementById('iconMoon');
+const sun  = document.getElementById('iconSun');
+let dark = false;
+toggle.addEventListener('click', () => {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  moon.style.display = dark ? 'none' : 'block';
+  sun.style.display  = dark ? 'block' : 'none';
+});
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Navbar border on scroll
+const nav = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  nav.style.borderBottomColor = window.scrollY > 20 ? 'var(--border)' : 'transparent';
+}, { passive: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+# ═══════════════════════════════════════════════════════════════
+# Cadencia — .dockerignore
+# Keep production image lean: no tests, docs, VCS, caches
+# ═══════════════════════════════════════════════════════════════
+
+# Version control
+.git
+.gitignore
+
+# Python caches
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+
+# Virtual environment
+.venv
+venv
+env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Tests (not needed in production image)
+tests/
+PHASE*_TESTS.md
+
+# Documentation (not needed in runtime)
+docs/
+*.md
+!README.md
+
+# Development config
+.env
+.env.*
+!.env.example
+Dockerfile.dev
+docker-compose*.yml
+Caddyfile
+
+# Infrastructure / CI
+infra/
+.github/
+.claude/
+
+# Build artifacts
+artifacts/
+scripts/
+contracts/
+
+# Node (if any)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/

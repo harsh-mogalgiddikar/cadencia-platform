@@ -1,0 +1,112 @@
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Cadencia Full Stack — Docker Compose
+# Services: PostgreSQL, Redis, Backend (FastAPI), Frontend (Next.js), MinIO
+# ═══════════════════════════════════════════════════════════════════════════
+
+services:
+  # ── PostgreSQL 16 with pgvector ─────────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cadencia
+      POSTGRES_PASSWORD: cadencia_dev
+      POSTGRES_DB: cadencia
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cadencia"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis 7 ─────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── MinIO (S3-compatible, for agent memory vault) ──────────────────────
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+
+  # ── Backend (FastAPI) ───────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./cadencia-a2a-phases
+      dockerfile: Dockerfile
+      target: production
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./cadencia-a2a-phases/.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://cadencia:cadencia_dev@postgres:5432/cadencia
+      REDIS_URL: redis://redis:6379/0
+      AWS_S3_ENDPOINT: http://minio:9000
+      CORS_ALLOWED_ORIGINS: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+  # ── Database Migrations ─────────────────────────────────────────────────
+  migrate:
+    build:
+      context: ./cadencia-a2a-phases
+      dockerfile: Dockerfile
+      target: migration
+    env_file:
+      - ./cadencia-a2a-phases/.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://cadencia:cadencia_dev@postgres:5432/cadencia
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  # ── Frontend (Next.js) ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./final-frontend-cadencia
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_ENABLE_MOCKS: "false"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  miniodata:

@@ -1,0 +1,159 @@
+# ═══════════════════════════════════════════════════════════════
+# Cadencia — Production Docker Stack
+# context.md §16: Gunicorn 4 workers, Caddy HTTPS, health checks
+# CLAUDE.md: docker-compose -f docker-compose.prod.yml up
+#
+# Key differences from docker-compose.yml (dev):
+#   - No Algorand localnet (uses testnet/mainnet via env vars)
+#   - Gunicorn (4 UvicornWorkers) instead of uvicorn --reload
+#   - Redis with password auth, no exposed ports for DB/Redis
+#   - Caddy with real TLS via Let's Encrypt
+#   - APP_ENV=production (disables Swagger /docs)
+#   - Resource limits enforced
+#
+# Usage:
+#   cp .env.prod.example .env
+#   docker compose -f docker-compose.prod.yml up -d
+# ═══════════════════════════════════════════════════════════════
+
+version: "3.9"
+
+services:
+
+  # ── PostgreSQL 16 + pgvector ─────────────────────────────────
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: cadencia_prod_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-cadencia}
+    volumes:
+      - cadencia_prod_db_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-cadencia}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+    # No port mapping — only accessible within Docker network
+
+  # ── Redis 7 (password auth, no exposed ports) ────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: cadencia_prod_redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - cadencia_prod_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+    # No port mapping — only accessible within Docker network
+
+  # ── Database migration (one-off) ─────────────────────────────
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migration
+    container_name: cadencia_prod_migration
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-cadencia}?ssl=require
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  # ── FastAPI API (Gunicorn + 4 UvicornWorkers) ────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: cadencia_prod_api
+    restart: unless-stopped
+    command: >
+      gunicorn main:app
+      --worker-class uvicorn.workers.UvicornWorker
+      --workers 4
+      --bind 0.0.0.0:8000
+      --timeout 120
+      --graceful-timeout 30
+      --access-logfile -
+      --error-logfile -
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-cadencia}?ssl=require
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      X402_SIMULATION_MODE: "false"
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+    # No direct port mapping — only accessible via Caddy
+
+  # ── Caddy reverse proxy (HTTPS / Let's Encrypt) ──────────────
+  caddy:
+    image: caddy:2-alpine
+    container_name: cadencia_prod_caddy
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile.prod:/etc/caddy/Caddyfile:ro
+      - cadencia_prod_caddy_data:/data
+      - cadencia_prod_caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      api:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+volumes:
+  cadencia_prod_db_data:
+    driver: local
+  cadencia_prod_redis_data:
+    driver: local
+  cadencia_prod_caddy_data:
+    driver: local
+  cadencia_prod_caddy_config:
+    driver: local
