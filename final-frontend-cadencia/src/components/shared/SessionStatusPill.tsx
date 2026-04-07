@@ -8,11 +8,13 @@ interface SessionStatusPillProps {
 }
 
 const statusConfig: Record<SessionStatus, { label: string; className: string }> = {
-  ACTIVE:     { label: 'Active',     className: 'bg-green-950 text-green-400 border-green-900' },
-  AGREED:     { label: 'Agreed',     className: 'bg-green-950 text-green-400 border-green-900' },
-  STALLED:    { label: 'Stalled',    className: 'bg-amber-950 text-amber-400 border-amber-900' },
-  FAILED:     { label: 'Failed',     className: 'bg-red-950 text-destructive border-red-900' },
-  TERMINATED: { label: 'Terminated', className: 'bg-muted text-muted-foreground border-border' },
+  ACTIVE:       { label: 'Active',        className: 'bg-green-950 text-green-400 border-green-900' },
+  AGREED:       { label: 'Agreed',        className: 'bg-green-950 text-green-400 border-green-900' },
+  WALK_AWAY:    { label: 'Walk Away',     className: 'bg-amber-950 text-amber-400 border-amber-900' },
+  TIMEOUT:      { label: 'Timed Out',     className: 'bg-amber-950 text-amber-400 border-amber-900' },
+  POLICY_BREACH:{ label: 'Policy Breach', className: 'bg-red-950 text-destructive border-red-900' },
+  FAILED:       { label: 'Failed',        className: 'bg-red-950 text-destructive border-red-900' },
+  TERMINATED:   { label: 'Terminated',    className: 'bg-muted text-muted-foreground border-border' },
 };
 
 export function SessionStatusPill({ status, currentRound, maxRounds }: SessionStatusPillProps) {

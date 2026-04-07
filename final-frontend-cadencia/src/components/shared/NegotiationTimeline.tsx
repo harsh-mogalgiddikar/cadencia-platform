@@ -59,7 +59,7 @@ export function NegotiationTimeline({ offers, sessionStatus }: NegotiationTimeli
               <div className="flex flex-wrap gap-2 mt-1.5">
                 {Object.entries(offer.terms).map(([k, v]) => (
                   <span key={k} className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded">
-                    {k}: {v}
+                    {k}: {String(v)}
                   </span>
                 ))}
               </div>

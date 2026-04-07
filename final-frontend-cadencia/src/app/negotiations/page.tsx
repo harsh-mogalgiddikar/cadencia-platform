@@ -165,8 +165,8 @@ export default function NegotiationsPage() {
             isLoading={isLoading}
           />
           <StatCard
-            label="Stalled Sessions"
-            value={counts.STALLED}
+            label="Failed Sessions"
+            value={counts.FAILED}
             icon={Pause}
             isLoading={isLoading}
           />
